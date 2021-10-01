@@ -1,4 +1,4 @@
-const conn = require(__dirname + '/../DB/DBConnection.js');
+const conn = require(__dirname + '/../DB/DBConnection.js.js');
 
 module.exports = {
     name: 'ready',
