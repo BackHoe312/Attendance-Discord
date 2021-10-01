@@ -3,6 +3,11 @@ const { Client, Intents, Collection } = require('discord.js');
 const { token, channelId } = require(__dirname + '/config.json');
 // embed
 const { createEmbed } = require(__dirname + '/embed/welcomEmbed.js');
+// DB
+const db_config = require(__dirname + '/DB/DBConnection.js');
+const conn = db_config.init();
+// student info
+let id, name;
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS] });
 
@@ -21,28 +26,48 @@ for (const file of commandFiles) {
     client.commands.set(command.data.name, command);
 }
 
-// events 파일 읽기
-const eventFiles = fs.readdirSync(__dirname + '/events')
-    .filter(file => file.endsWith('.js'));
-
-for (const file of eventFiles) {
-    const event = require(__dirname + `/events/${file}`);
-    // console.log(event);
-    if (event.once) {
-        client.once(event.name, async (...args) => event.execute(...args));
-    } else {
-        client.on(event.name, async (...args) => event.execute(...args));
+client.once('ready', async () => {
+    console.log(`Ready!\nLogged in as ${client.user.tag}`);
+    try {
+        conn.connect();
+        console.log("Connected MySQL!");
+    } catch (e) {
+        console.error(e);
     }
-}
+})
 
 client.on('interactionCreate', async interaction => {
     // console.log(interaction);
-    if (interaction.customId === 'track') {
-        const track = interaction.values;
-        const command = client.commands.get(interaction.commandName);
-        console.log(command)
-        console.log(command.values.id);
-        console.log(track);
+    if (interaction.isSelectMenu() || interaction.commandName === 'insert') {
+        if (interaction.isSelectMenu()) {
+            const track = interaction.values;
+            const sql = `insert into std_list(sid, sname, track) values('${id}', '${name}', '${track}');`;
+            conn.query(sql, function (error, result, field) {
+                if (error) console.log(error);
+                else console.log('SQL Success!');
+                console.log(result);
+            });
+            await interaction.update({ content: `Success! Welcome ${name} in Root!`, components: [] });
+        }
+        else {
+            const command = client.commands.get(interaction.commandName);
+
+            console.log(`${interaction.user.tag} in #${interaction.channel.name} triggered an interaction.\n`
+                + `command used: ${interaction.commandName}`);
+
+            try {
+                await command.execute({client, interaction});
+
+                // console.log(interaction);
+            } catch (error) {
+                console.error(error);
+                await interaction.reply({content: 'The was error while executing this command!', ephemeral: true});
+            }
+
+            const stdID = command.getID()
+            id = stdID.id;
+            name = stdID.name;
+        }
     }
     else if (interaction.isCommand()) {
 
@@ -70,6 +95,20 @@ client.on('guildMemberAdd', async member => {
 
     await client.channels.cache.get(channelId).send({ embeds: [createEmbed({ member })] });
 });
+
+// events 파일 읽기
+// const eventFiles = fs.readdirSync(__dirname + '/events')
+//     .filter(file => file.endsWith('.js'));
+//
+// for (const file of eventFiles) {
+//     const event = require(__dirname + `/events/${file}`);
+//     // console.log(event);
+//     if (event.once) {
+//         client.once(event.name, async (...args) => event.execute(...args));
+//     } else {
+//         client.on(event.name, async (...args) => event.execute(...args));
+//     }
+// }
 
 // client login
 client.login(token);

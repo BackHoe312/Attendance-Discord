@@ -1,5 +1,5 @@
 {
-  "name": "discordbot-exam",
+  "name": "Attendance-Discord",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -7,14 +7,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BackHoe312/discordbot-exam.git"
+    "url": "git+https://github.com/BackHoe312/Attendance-Discord.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/BackHoe312/discordbot-exam/issues"
+    "url": "https://github.com/BackHoe312/Attendance-Discord/issues"
   },
-  "homepage": "https://github.com/BackHoe312/discordbot-exam#readme",
+  "homepage": "https://github.com/BackHoe312/Attendance-Discord#readme",
   "dependencies": {
     "@discordjs/builders": "^0.6.0",
     "@discordjs/rest": "^0.1.0-canary.0",

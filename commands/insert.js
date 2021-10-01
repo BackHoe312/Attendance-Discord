@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { trackEmbed } = require(__dirname + '/../embed/trackEmbed.js');
-let stdID, id, name;
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -26,8 +25,8 @@ module.exports = {
             await interaction.reply({ content: "Select Your Track!", components: [ trackEmbed ], ephemeral: true });
         }
     },
-    values: {
-        id,
-        name
+    getID() {
+        const stdID = {id,name};
+        return stdID;
     }
 };
