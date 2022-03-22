@@ -38,16 +38,30 @@ client.once('ready', async () => {
 
 client.on('interactionCreate', async interaction => {
     // console.log(interaction);
+    let msg = "";
     if (interaction.isSelectMenu() || interaction.commandName === 'insert') {
         if (interaction.isSelectMenu()) {
             const track = interaction.values;
-            const sql = `insert into std_list(sid, sname, track) values('${id}', '${name}', '${track}');`;
-            conn.query(sql, function (error, result, field) {
-                if (error) console.log(error);
-                else console.log('SQL Success!');
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth() + 1;
+            const date = today.getDate();
+            const joindate = `${year}/${month}/${date}`;
+
+            const sql = `insert into std_list(sid, sname, track, joindate) values('${id}', '${name}', '${track}', '${joindate}');`;
+            await conn.query(sql, function (error, result, field) {
+                if (error) {
+                    console.log(error);
+                    msg = "오류가 발생했습니다. 관리자에게 문의해주세요.";
+                }
+                else {
+                    console.log('SQL Success!');
+                    msg = "성공적으로 저장되었습니다. 루트에 오신 것을 환영합니다!";
+                }
                 console.log(result);
             });
-            await interaction.update({ content: `Success! Welcome ${name} in Root!`, components: [] });
+            // await interaction.update({ content: `${msg}`, components: [] });
+            interaction.update({ content: msg, components: [] });
         }
         else {
             const command = client.commands.get(interaction.commandName);
@@ -56,6 +70,8 @@ client.on('interactionCreate', async interaction => {
                 + `command used: ${interaction.commandName}`);
 
             try {
+                // if (commandName === 'ping') {
+                //     await command.execute({ interaction })
                 await command.execute({client, interaction});
 
                 // console.log(interaction);
