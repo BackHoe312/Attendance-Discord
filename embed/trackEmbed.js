@@ -5,22 +5,22 @@ module.exports = {
         .addComponents(
             new MessageSelectMenu()
                 .setCustomId('track')
-                .setPlaceholder('Select Track')
+                .setPlaceholder('트랙 선택')
                 .addOptions([
                     {
                         label: 'Pwnable',
-                        description: 'like Systme hacking',
-                        value: 'pwnable',
+                        description: 'like System hacking',
+                        value: 'Pwnable',
                     },
                     {
                         label: 'Reversing',
                         description: 'analysis Program',
-                        value: 'reversing',
+                        value: 'Reversing',
                     },
                     {
                         label: 'WebHacking',
                         description: 'Hack a Web',
-                        value: 'webhacking',
+                        value: 'Webhacking',
                     }
                 ]),
         )
