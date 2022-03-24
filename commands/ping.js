@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const {createEmbed} = require("../embed/commitEmbed");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -6,6 +7,6 @@ module.exports = {
         .setDescription('Replies with Pong!'),
     async execute({ interaction }) {
         const timestamp = Math.abs(Date.now() - interaction.createdTimestamp);
-        await interaction.reply(`Pong! ${timestamp}ms`);
+        await interaction.reply({content: `Pong! ${timestamp}ms`, embeds: [createEmbed({ interaction })], ephemeral: true});
     }
 };
