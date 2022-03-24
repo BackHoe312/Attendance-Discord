@@ -86,6 +86,7 @@ client.on('guildMemberAdd', async member => {
     console.log('guildMemberAdd Event Triggered!');
 
     // await client.channels.cache.get(channelId).send({ embeds: [createEmbed({ member })] });
+    await client.channel.send({ embeds: [createEmbed({ member })] });
     // await member.guild.channels.cache.get(channelId).send({ embeds: [createEmbed({ member })] });
     // console.log(member.guild.channels.cache.get(channelId)); // undefined
 });

@@ -17,13 +17,13 @@ module.exports = {
         sid = interaction.options.getString('학번');
         sname = interaction.options.getString('이름');
 
-        if (isNaN(sid)) { // 학번이 숫자가 아닐 경우
+        if (isNaN(sid)) { // 학번이 숫자가 아니거나 입력하지 않았을 경우
             await interaction.reply({ content: `학번은 숫자만 입력할 수 있습니다.\nYour entered: ${sid}, ${sname}`, ephemeral: true });
             return;
         } else if (sid.length != 5) {
           await interaction.reply({ content: `학번은 5글자로 입력해주세요.\nYour entered: ${sid}, ${sname}`, ephemeral: true });
           return;
-        } else if (!isNaN(sname)) { // 이름이 숫자일 경우
+        } else if (!isNaN(sname)) { // 이름이 숫자이거나 입력하지 않았을 경우
             await interaction.reply({ content: `형식에 맞지 않는 이름입니다.\nYour entered:  ${sid}, ${sname}`, ephemeral: true });
             return;
         }
@@ -69,7 +69,7 @@ module.exports = {
                 const role = interaction.message.guild.roles.cache.find(role => role.name === track[0]);
                 interaction.member.roles.add(role);
 
-                interaction.reply({ content: `학생 정보 입력이 완료되었습니다. 루트에 오신 것을 환영합니다!`, embeds: [createEmbed({ interaction, sid, sname, track})], ephemeral: false });
+                interaction.reply({ content: `루트에 오신 것을 환영합니다! <@${interaction.user.id}>`, embeds: [createEmbed({ interaction, sid, sname, track})], ephemeral: false });
             }
         });
     }

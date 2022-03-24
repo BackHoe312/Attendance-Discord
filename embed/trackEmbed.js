@@ -18,10 +18,11 @@ module.exports = {
                         value: 'Reversing',
                     },
                     {
-                        label: 'WebHacking',
+                        label: 'WebHack',
                         description: 'Hack a Web',
-                        value: 'Webhacking',
+                        value: 'WebHack',
                     }
                 ]),
         )
+
 };
