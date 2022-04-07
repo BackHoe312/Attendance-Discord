@@ -1,15 +1,10 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { trackEmbed } = require(__dirname + '/../embed/trackEmbed.js');
-const { createEmbed } = require(__dirname + '/../embed/commitEmbed.js');
-// DB
-// const db_config = require(__dirname + '/DB/DBConnection.js');
-// const conn = db_config.init();
-// wait for the bot to be ready
-const wait = require('node:timers/promises').setTimeout;
+const { commitEmbed } = require(__dirname + '/../embed/commitEmbed.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('insert')
+        .setName('입력')
         .setDescription("학생 정보를 입력합니다.")
         .addStringOption(option => option.setName('학번').setDescription('학번을 입력해주세요.'))
         .addStringOption(option => option.setName('이름').setDescription('이름을 입력해주세요.')),
@@ -30,7 +25,7 @@ module.exports = {
 
         const sql = `SELECT * FROM std_list WHERE sid = '${sid}'`; // 중복 여부 sql
 
-        conn.query(sql, function(err, result, fields) { // sql 실행
+        await conn.query(sql, function(err, result, fields) { // sql 실행
             if (err) throw err;
             // console.log("result : " + result);
             // console.log("fields : " + fields);
@@ -52,12 +47,14 @@ module.exports = {
         const month = today.getMonth() + 1;
         const date = today.getDate();
         const joindate = `${year}/${month}/${date}`; // 가입 날짜
+        const user_id = interaction.user.id; // 유저 id
 
-        console.log('sid: ' + sid);
+        console.log(`${sid}_${sname} 이(가) ${track} 트랙으로 가입합니다.`);
+        console.log(`join date : ${joindate} | user id : ${user_id}`);
 
-        const sql = `insert into std_list(sid, sname, track, joindate) values('${sid}', '${sname}', '${track}', '${joindate}');`;
+        const sql = `insert into std_list(sid, sname, track, joindate, user_id) values('${sid}', '${sname}', '${track}', '${joindate}', '${user_id}');`;
 
-        conn.query(sql, function (error, result, field) {
+        await conn.query(sql, function (error, result, field) {
             if (error) {
                 console.log(error);
                 interaction.reply({ content: '오류가 발생했습니다. ', ephemeral: true });
@@ -69,7 +66,8 @@ module.exports = {
                 const role = interaction.message.guild.roles.cache.find(role => role.name === track[0]);
                 interaction.member.roles.add(role);
 
-                interaction.reply({ content: `루트에 오신 것을 환영합니다! <@${interaction.user.id}>`, embeds: [createEmbed({ interaction, sid, sname, track})], ephemeral: false });
+                interaction.reply({ content: `루트에 오신 것을 환영합니다! <@${interaction.user.id}>`, embeds: [commitEmbed({ interaction, sid, sname, track})], ephemeral: false });
+                // client.channel.send({ content: `루트에 오신 것을 환영합니다! <@${interaction.user.id}>`, embeds: [commitEmbed({ interaction, sid, sname, track})], ephemeral: false });
             }
         });
     }

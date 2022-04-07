@@ -1,13 +1,18 @@
 // discord.js 클래스
-const { Client, Intents, Collection, Role } = require('discord.js');
+const { Client, Intents, Collection } = require('discord.js');
 const { token, channelId } = require(__dirname + '/config.json');
+
+// scheduling
+const scheduling = require('./events/schedule');
+
 // embed
-const { createEmbed } = require(__dirname + '/embed/welcomEmbed.js');
+const { welcomeEmbed } = require(__dirname + '/embed/welcomeEmbed.js');
 // DB
 const db_config = require(__dirname + '/DB/DBConnection.js');
 const conn = db_config.init();
-// student info
-let id, name;
+
+// 메시지 수정을 위한 변수
+let msgId = null;
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS] });
 
@@ -29,19 +34,20 @@ for (const file of commandFiles) {
 client.once('ready', async () => {
     console.log(`Ready!\nLogged in as ${client.user.tag}`);
     try {
-        conn.connect();
+        await conn.connect({conn});
         console.log("Connected MySQL!");
     } catch (e) {
         console.error(e);
     }
+    await scheduling();
 })
 
 client.on('interactionCreate', async interaction => {
     // console.log(interaction);
-    if (interaction.isSelectMenu() || interaction.commandName === 'insert') {
+    if (interaction.isSelectMenu() || interaction.commandName === '입력') {
         if (interaction.isSelectMenu()) {
-            const command = client.commands.get('insert');
-            await command.track({interaction, conn});
+            const command = client.commands.get('입력');
+            command.track({interaction, conn});
         }
         else {
             const command = client.commands.get(interaction.commandName);
@@ -57,7 +63,7 @@ client.on('interactionCreate', async interaction => {
                 // console.log(interaction);
             } catch (error) {
                 console.error(error);
-                await interaction.reply({content: 'The was error while executing this command!', ephemeral: true});
+                await interaction.reply({content: '명령 실행 중 오류가 발생했습니다.', ephemeral: true});
             }
         }
     }
@@ -71,7 +77,11 @@ client.on('interactionCreate', async interaction => {
             + `command used: ${interaction.commandName}`);
 
         try {
-            await command.execute({client, interaction});
+            if (interaction.commandName === '출석') {
+                await command.execute({interaction, client, conn});
+            } else {
+                await command.execute({interaction, client});
+            }
 
             // console.log(interaction);
         } catch (error) {
@@ -85,9 +95,9 @@ client.on('interactionCreate', async interaction => {
 client.on('guildMemberAdd', async member => {
     console.log('guildMemberAdd Event Triggered!');
 
-    // await client.channels.cache.get(channelId).send({ embeds: [createEmbed({ member })] });
-    await client.channel.send({ embeds: [createEmbed({ member })] });
-    // await member.guild.channels.cache.get(channelId).send({ embeds: [createEmbed({ member })] });
+    await client.channels.cache.get(channelId).send({ embeds: [welcomeEmbed({ member })] });
+    // await client.channel.send({ embeds: [welcomeEmbed({ member })] });
+    // await member.guild.channels.cache.get(channelId).send({ embeds: [welcomeEmbed({ member })] });
     // console.log(member.guild.channels.cache.get(channelId)); // undefined
 });
 
@@ -104,6 +114,8 @@ client.on('guildMemberAdd', async member => {
 //         client.on(event.name, async (...args) => event.execute(...args));
 //     }
 // }
+
+module.exports = {client, conn, msgId};
 
 // client login
 client.login(token);
