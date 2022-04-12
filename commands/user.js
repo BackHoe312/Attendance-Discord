@@ -7,7 +7,6 @@ module.exports = {
     async execute({ interaction, ...params }) {
         const date = new Date(interaction.member.joinedTimestamp);
         await interaction.reply(`Your tag: ${interaction.user.tag}\n`
-            + `Your id: ${interaction.user.id}\n`
             + `Join: ${date}\n`
             + `Your avatar: ${interaction.user.avatarURL()}`
         );

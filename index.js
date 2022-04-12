@@ -1,22 +1,22 @@
 // discord.js 클래스
-const { Client, Intents, Collection } = require('discord.js');
+const { Collection } = require('discord.js');
+
+// config
 const { token, channelId } = require(__dirname + '/config.json');
+
+// conn, client Module
+const { client, conn } = require('./context');
 
 // scheduling
 const scheduling = require('./events/schedule');
 
 // embed
 const { welcomeEmbed } = require(__dirname + '/embed/welcomeEmbed.js');
-// DB
-const db_config = require(__dirname + '/DB/DBConnection.js');
-const conn = db_config.init();
 
 // 메시지 수정을 위한 변수
-let msgId = null;
+// let msgId = null;
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS] });
-
-// command 파일 읽기/
+// command 파일 읽기
 const fs = require('fs');
 
 client.commands = new Collection();
@@ -39,7 +39,7 @@ client.once('ready', async () => {
     } catch (e) {
         console.error(e);
     }
-    await scheduling();
+    await scheduling({conn});
 })
 
 client.on('interactionCreate', async interaction => {
@@ -95,10 +95,7 @@ client.on('interactionCreate', async interaction => {
 client.on('guildMemberAdd', async member => {
     console.log('guildMemberAdd Event Triggered!');
 
-    await client.channels.cache.get(channelId).send({ embeds: [welcomeEmbed({ member })] });
-    // await client.channel.send({ embeds: [welcomeEmbed({ member })] });
-    // await member.guild.channels.cache.get(channelId).send({ embeds: [welcomeEmbed({ member })] });
-    // console.log(member.guild.channels.cache.get(channelId)); // undefined
+    await client.channels.cache.get(channelId).send({ embeds: [welcomeEmbed({ member })] }); // send embed
 });
 
 // events 파일 읽기
@@ -114,8 +111,6 @@ client.on('guildMemberAdd', async member => {
 //         client.on(event.name, async (...args) => event.execute(...args));
 //     }
 // }
-
-module.exports = {client, conn, msgId};
 
 // client login
 client.login(token);
